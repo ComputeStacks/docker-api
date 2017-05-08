@@ -16,6 +16,8 @@ Excon.defaults[:middlewares].unshift Excon::Middleware::Hijack
 
 Excon.defaults[:middlewares] << Excon::Middleware::RedirectFollower
 
+Excon.defaults[:ciphers] = 'DEFAULT'
+
 # The top-level module for this gem. Its purpose is to hold global
 # configuration variables that are used as defaults in other classes.
 module Docker
