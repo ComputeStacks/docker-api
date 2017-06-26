@@ -12,11 +12,11 @@ class Docker::Image
     begin
       Docker::Container.create(opts, connection)
                        .tap(&:start!)
-    rescue ServerError => ex
+    rescue ServerError, ClientError => ex
       if cmd
         raise ex
       else
-        raise ServerError, "No command specified."
+        raise ex, "No command specified."
       end
     end
   end
@@ -117,7 +117,10 @@ class Docker::Image
         :headers => headers,
         :response_block => response_block(body, &block)
         )
+      # NOTE: see associated tests for why we're looking at image#end_with?
       image = opts['fromImage'] || opts[:fromImage]
+      tag = opts['tag'] || opts[:tag]
+      image = "#{image}:#{tag}" if tag && !image.end_with?(":#{tag}")
       get(image, {}, conn)
     end
 
