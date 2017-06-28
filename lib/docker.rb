@@ -150,5 +150,5 @@ module Docker
   module_function :default_socket_url, :env_url, :url, :url=, :env_options,
                   :options, :options=, :creds, :creds=, :logger, :logger=,
                   :connection, :reset!, :reset_connection!, :version, :info,
-                  :ping, :authenticate!, :validate_version!, :ssl_options
+                  :ping, :authenticate!, :validate_version!, :ssl_options, :data_usage
 end
