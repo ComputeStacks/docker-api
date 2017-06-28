@@ -121,6 +121,11 @@ module Docker
     connection.get('/_ping')
   end
 
+  # Get data usage
+  def data_usage(connection = self.connection)
+    connection.get('/system/df')
+  end
+
   # Login to the Docker registry.
   def authenticate!(options = {}, connection = self.connection)
     creds = options.to_json
