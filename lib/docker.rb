@@ -123,7 +123,7 @@ module Docker
 
   # Get data usage
   def data_usage(connection = self.connection)
-    connection.get('/system/df')
+    Util.parse_json(connection.get('/system/df'))
   end
 
   # Login to the Docker registry.
