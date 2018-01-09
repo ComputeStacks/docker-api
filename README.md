@@ -413,7 +413,7 @@ container.read_file("/test")
 
 # Export a Container. Since an export is typically at least 300M, chunks of the
 # export are yielded instead of just returning the whole thing.
-File.open('export.tar', 'w') do |f|
+File.open('export.tar', 'w') do |file|
   container.export { |chunk| file.write(chunk) }
 end
 # => nil
@@ -621,10 +621,6 @@ image 'repo:new_tag' => 'repo:tag' do
   image.tag('repo' => 'repo', 'tag' => 'new_tag')
 end
 ```
-
-## Known issues
-
-*   If the docker daemon is always responding to your requests with a 400 Bad Request when using UNIX sockets, verify you're running Excon version 0.46.0 or greater. [Link](https://github.com/swipely/docker-api/issues/381)
 
 ## Not supported (yet)
 

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-SingleCov.covered! uncovered: 2
+SingleCov.covered! uncovered: 3
 
 describe Docker::Image do
   describe '#to_s' do
@@ -259,22 +259,40 @@ describe Docker::Image do
       end
     end
 
-    context 'when cmd is nil'  do
+    context 'when cmd is nil', docker_1_12: true do
       let(:cmd) { nil }
+
       context 'no command configured in image' do
         subject { described_class.create('fromImage' => 'swipely/base') }
         it 'should raise an error if no command is specified' do
-          expect {container}.to raise_error("No command specified.")
+          expect { container }.to raise_error(
+            Docker::Error::ClientError,
+            /No\ command\ specified/
+          )
         end
       end
+    end
 
-      context "command configured in image" do
-        let(:cmd) { 'pwd' }
-        after { container.remove }
+    context 'when cmd is nil', docker_1_12: false do
+      let(:cmd) { nil }
 
-        it 'should normally show result if image has Cmd configured' do
-          expect(output).to eql "/\n"
+      context 'no command configured in image' do
+        subject { described_class.create('fromImage' => 'swipely/base') }
+        it 'should raise an error if no command is specified' do
+          expect { container }.to raise_error(
+            Docker::Error::ServerError,
+            /No\ command\ specified/
+          )
         end
+      end
+    end
+
+    context "command configured in image" do
+      let(:cmd) { 'pwd' }
+      after { container.remove }
+
+      it 'should normally show result if image has Cmd configured' do
+        expect(output).to eql "/\n"
       end
     end
 
@@ -613,6 +631,12 @@ describe Docker::Image do
       end
 
       expect(images.length).to_not be_zero
+    end
+  end
+
+  describe '.prune', :docker_17_03 => true do
+    it 'prune images' do
+      expect { Docker::Image.prune }.not_to raise_error
     end
   end
 

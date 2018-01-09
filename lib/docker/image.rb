@@ -108,7 +108,7 @@ class Docker::Image
 
     # Create a new Image.
     def create(opts = {}, creds = nil, conn = Docker.connection, &block)
-      credentials = creds.nil? ? Docker.creds : creds.to_json
+      credentials = creds.nil? ? Docker.creds : MultiJson.dump(creds)
       headers = credentials && Docker::Util.build_auth_header(credentials) || {}
       body = ''
       conn.post(
@@ -136,6 +136,12 @@ class Docker::Image
       conn.delete("/images/#{id}", opts)
     end
     alias_method :delete, :remove
+
+    # Prune images
+    def prune(conn = Docker.connection)
+      conn.post("/images/prune", {})
+    end
+
 
     # Save the raw binary representation or one or more Docker images
     #

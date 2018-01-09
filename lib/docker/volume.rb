@@ -31,9 +31,14 @@ class Docker::Volume
     # creates a volume with an arbitrary name
     def create(name, opts = {}, conn = Docker.connection)
       opts['Name'] = name
-      resp = conn.post('/volumes/create', {}, :body => opts.to_json)
+      resp = conn.post('/volumes/create', {}, body: MultiJson.dump(opts))
       hash = Docker::Util.parse_json(resp) || {}
       new(conn, hash)
     end
+
+    def prune(conn = Docker.connection)
+      conn.post("/volumes/prune")
+    end
+
   end
 end

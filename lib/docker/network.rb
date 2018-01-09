@@ -3,17 +3,17 @@ class Docker::Network
   include Docker::Base
 
   def connect(container, opts = {}, body_opts = {})
+    body = MultiJson.dump({ container: container }.merge(body_opts))
     Docker::Util.parse_json(
-      connection.post(path_for('connect'), opts,
-                      body: { container: container }.merge(body_opts).to_json)
+      connection.post(path_for('connect'), opts, body: body)
     )
     reload
   end
 
   def disconnect(container, opts = {}, body_opts = {})
+    body = MultiJson.dump({ container: container }.merge(body_opts))
     Docker::Util.parse_json(
-      connection.post(path_for('disconnect'), opts,
-                      body: { container: container }.merge(body_opts).to_json)
+      connection.post(path_for('disconnect'), opts, body: body)
     )
     reload
   end
@@ -41,12 +41,11 @@ class Docker::Network
 
   class << self
     def create(name, opts = {}, conn = Docker.connection)
-      default_opts = {
+      default_opts = MultiJson.dump({
         'Name' => name,
         'CheckDuplicate' => true
-      }
-      resp = conn.post('/networks/create', {},
-                       body: default_opts.merge(opts).to_json)
+      }.merge(opts))
+      resp = conn.post('/networks/create', {}, body: default_opts)
       response_hash = Docker::Util.parse_json(resp) || {}
       get(response_hash['Id'], {}, conn) || {}
     end
@@ -67,6 +66,11 @@ class Docker::Network
       nil
     end
     alias_method :delete, :remove
+
+    def prune(conn = Docker.connection)
+      conn.post("/networks/prune", {})
+      nil
+    end
   end
 
   # Convenience method to return the path for a particular resource.
